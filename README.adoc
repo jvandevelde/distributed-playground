@@ -1,5 +1,11 @@
 = Getting Started
 :imagesdir: images
+ifdef::env-github[]
+:note-caption: :information_source:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+:important-caption: :exclamation:
+endif::[]
 
 Written using asciidoctor vs. markdown as a learning exercise
 
