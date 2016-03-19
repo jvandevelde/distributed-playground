@@ -1,0 +1,12 @@
+{
+    "bootstrap": false,
+    "server": false,
+    "datacenter": "dc1",
+    "data_dir": "/var/consul",
+    "ui_dir": "/usr/local/bin",
+    "log_level": "INFO",
+    "enable_syslog": true,
+    "bind_addr": "172.28.128.30",
+    "client_addr": "172.28.128.30",
+    "start_join": ["172.28.128.10", "172.28.128.11", "172.28.128.12"]
+}

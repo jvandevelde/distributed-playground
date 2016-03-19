@@ -1,0 +1,11 @@
+{
+    "bootstrap": false,
+    "server": true,
+    "datacenter": "dc1",
+    "data_dir": "/var/consul",
+    "log_level": "INFO",
+    "enable_syslog": true,
+    "bind_addr": "172.28.128.12",
+    "client_addr": "172.28.128.12",
+    "start_join": ["172.28.128.10", "172.28.128.11"]
+}

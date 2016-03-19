@@ -1,0 +1,38 @@
+docker run --name consul -h 172.28.128.20      \
+-p 172.28.128.20:8300:8300 \
+-p 172.28.128.20:8301:8301       \
+-p 172.28.128.20:8301:8301/udp   \
+-p 172.28.128.20:8302:8302      \
+-p 172.28.128.20:8302:8302/udp   \
+-p 172.28.128.20:8400:8400       \
+-p 172.28.128.20:8500:8500       \
+-p 172.17.0.1:53:53/udp      \
+-d -v /mnt:/data progrium/consul -server -advertise 172.28.128.20 -join 172.28.128.10
+
+docker run -d --name micro.5 \
+-p 5005:5000 \
+-e SERVICE_NAME=micro-5-env \
+-e SERVICE_5000_CHECK_HTTP=/ \
+-e SERVICE_5000_CHECK_INTERVAL=5s \
+-e SERVICE_TAGS=urlprefix-172.28.128.20/,urlprefix-/ \
+jlordiales/python-micro-service
+
+
+docker run -d --name jules.net.2 \
+-p 5011:5000 \
+-e SERVICE_NAME=jules.net.2 \
+-e SERVICE_5000_CHECK_HTTP=/ \
+-e SERVICE_5000_CHECK_INTERVAL=5s \
+-e SERVICE_TAGS=urlprefix-172.28.128.20/,urlprefix-/ \
+-e DOCKER_ENV_VAR1=jules.svc.var.1 \
+aspnetcore
+
+
+docker run -d --name jules.net.2 \
+-p 5002:5000 \
+-e SERVICE_NAME=jules.net.2 \
+-e SERVICE_5000_CHECK_HTTP=/ \
+-e SERVICE_5000_CHECK_INTERVAL=5s \
+-e SERVICE_TAGS=urlprefix-172.28.128.20/,urlprefix-/ \
+-e DOCKER_ENV_VAR1=jules.svc.var.2 \
+jvandevelde/aspnetcoredemo

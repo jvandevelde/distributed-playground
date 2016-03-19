@@ -1,0 +1,21 @@
+---
+cluster-servers:
+   - name: ext-1
+     ram: 512
+     private_ip: 172.28.128.10
+   - name: ext-2
+     ram: 512
+     private_ip: 172.28.128.11
+   - name: ext-3
+     ram: 512
+     private_ip: 172.28.128.12
+docker-host-servers:
+   - name: docker-1
+     ram: 1024
+     private_ip: 172.28.128.20
+     container_prefix: host1
+   - name: docker-2
+     ram: 1024
+     private_ip: 172.28.128.21
+     container_prefix: host2
+   
