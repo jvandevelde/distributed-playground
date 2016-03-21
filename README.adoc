@@ -12,28 +12,51 @@ Written using asciidoctor vs. markdown as a learning exercise
 WARNING: Work in progress
 
 == Overview
-A sample distributed service environment utilizing:
+This repository contains utilizes the following stack to create a distributed
+service environment that could be utilized to experiment with micro-services,
+ASP.NET Core and any other tech stacks that require some part of the stack
+already available.
 
-1. *Vagrant* - for machine orchestration
-2. *Consul.io* - As a service registry & discovery platform
-3. *Docker* - To host demo services
-4. *Fabio HTTP Router* - As a front-end service router making it easier to address
-a service at a specific address/port and have each request automatically redirected
-and balanced across all available service instances
+1. *https://www.vagrantup.com/[Vagrant]* - Virtual machine creation, provisioning & orchestration
+2. *https://www.consul.io/[Consul]* - Service registry & discovery platform
+3. *https://www.docker.com/[Docker]* - Service hosting environment allowing for easy deployment of multi-instance
+services
+4. *https://get.asp.net/[ASP.NET 5/Core]* - A demo service is written using ASP.NET Core and built as a Docker
+image automatically as part of the Vagrant provisioning of the `docker-1` & `docker-2`
+machines. This image is then used to create several instances of the service on each
+host machine.
+5. *https://github.com/eBay/fabio[Fabio HTTP Router]* - Front-end service router to make it easy to access services
+via a specific address/port. Each request is automatically redirected
+and balanced across all available service instances, wherever they are actually located
 +
-Utilizes Consul as a backend to automatically discover available
-instances of a service
+.Fabio & Consul
+****
+Fabio utilizes Consul as a backend to configure itself and immediately have new instances
+of a service available for request routing (vs needing to configure a load balancer each
+time an new service instance is available or moves)
+****
+
+=== Environment Diagram
 
 image::system_overview.png[]
 
 == Required Software
 
-1. Vagrant
-2. Virtual Box (currently it's the only provider supported in Vagrantfile)
+1. https://www.vagrantup.com/downloads.html[Vagrant]
+2. https://www.virtualbox.org/wiki/Downloads[Virtual Box]
++
+Currently VirtualBox is the only provider supported in the repository's Vagrantfile.
+This may be expanded in the future to work with Hyper-V/AWS/Azure/Digital Ocean
++
+WARNING: If installing VirtualBox on a Windows 8+ machine, you will need to make sure
+to disable and/or un-install Hyper-V before being able to use VirtualBox. Un-installing
+the Hyper-V Windows feature should not remove any existing Virtual Machine images and
+is fairly quick to do. This is one reason I would like to build Hyper-V support into
+the Vagrantfile in the future.
 
 == Quickstart
 
-1. Add the `ubuntu/trusty64` Ubuntu linux box to your Vagrant installation by running
+1. Add the `ubuntu/trusty64` box to your Vagrant installation by running
 +
 `vagrant box ubuntu/trusty64`
 2. Clone this repository
@@ -44,46 +67,65 @@ image::system_overview.png[]
 Once the machines have been created and provisioned by Vagrant, you should be able to do
 the following:
 
+- SSH into the Docker hosts to inspect Docker container status
++
+`vagrant ssh docker-1`
++
+Once inside the Docker host, you can query Docker via
++
+`docker ps` (view all running containers)
++
+`docker ps -a` (view all containers)
 - Access the Consul Web UI to view all available services
 +
 http://172.28.128.30:8500/ui/
 - View all services and instances registered with Consul by using
-the Consul REST API(s) on any of the `ext-x` machines
+the Consul REST API(s) on any of the `ext-n` machines
 +
 *Examples:*
 +
 View all registered services
++
 http://172.28.128.10:8500/v1/catalog/services
++
 http://172.28.128.11:8500/v1/catalog/services
 +
 View details of a specific service
-http://172.28.128.10:8500/v1/catalog/service/demo.svc.host1.inst1
++
+http://172.28.128.11:8500/v1/catalog/service/demosvc.1
 
 - Access the Fabio HTTP Router Web UI to view all service instances
 +
 http://172.28.128.31:9998
 +
-The services can be accessed via the routers ip on port 9999
+The services can be accessed via the routers IP on port 9999
 +
 http://172.28.128.31:9999
 
 == Minimal startup
 
-- run `vagrant up ext-1 docker-1 consulclient httprouter`
+A minimal startup of the environment requires at least one Consul server, a
+Docker host to run services on and the Fabio HTTP router.
+
+To create and/or start only these Virtual machines, you can run:
+
+- run `vagrant up ext-1 docker-1 httprouter`
 
 == Machine Descriptions
 
 1. ext-1, ext-2, ext-3
 +
-These machines host clusters outside of Docker. Currently only the Consul.io
-cluster is hosted on these hosts. This may not be necessary but in the future
-Docker Swarm may be introduced which also requires a Service Registry.
+These machines host clusters outside of Docker. Currently only the Consul
+cluster is hosted on these virtual machines. Doing it this way may not be strictly
+necessary but in the future *Docker Swarm* may be introduced which also requires a
+service registry to be available and I'm not sure if it can be hosted on the Docker
+hosts being placed into a swarm.
 +
 ElasticSearch master nodes may also be hosted on these machines in the future
 
 2. docker-1, docker-2
 +
-These machines host Docker and automatically get provisioned with
+These machines host Docker and automatically get provisioned with:
 +
 - *Registrator*
    +
@@ -94,8 +136,9 @@ These machines host Docker and automatically get provisioned with
   Used to communicate with the main Consul cluster hosted on `ext-1, ext-2 & ext-3`
 
 NOTE: Registrator communicates with Consul via this container instead of the main Consul cluster
-  nodes. Because the cluster nodes are responsible for managing cluster state/health, it is recommended
-  to use lighter weight Consul agent in client mode to perform service registration/discover tasks
+  nodes. Because the cluster server nodes are responsible for managing cluster state/health, it is recommended
+  to use lighter weight Consul agent in client mode to perform service registration/discover requests
+  which are then forwarded to the server nodes.
 
 == Debugging
 
