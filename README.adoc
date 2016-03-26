@@ -67,6 +67,67 @@ the Vagrantfile in the future.
 Once the machines have been created and provisioned by Vagrant, you should be able to do
 the following:
 
+- The demo Hello World service can be accessed via the Fabio Router address on port 9999.
+Making multiple requests to this address will result in those requests being automatically
+balanced across all running instances of the service container across the Docker hosts.
+*The service response includes which host & instance returned the result*
++
+http://172.28.128.31:9999
++
+- To view the Fabio HTTP Router Web UI to view all registered service instances:
++
+http://172.28.128.31:9998
++
+- Access the Consul Web UI to view all available services
++
+http://172.28.128.30:8500/ui/
+- View all services and instances registered with Consul by using
+the Consul REST API(s) on any of the `ext-n` machines
++
+.Consul REST API examples
+|===
+|Task|URL
+
+|Query for all registered services
+(Can query all consul instances)
+|http://172.28.128.10:8500/v1/catalog/services
+http://172.28.128.11:8500/v1/catalog/services
+http://172.28.128.12:8500/v1/catalog/services
+
+|Query details of a specific service
+|http://172.28.128.11:8500/v1/catalog/service/demosvc.1
+|===
++
+- Access the ElasticSearch REST APIs directly running on the `ext-1`, `ext-2`, `ext-3` nodes
++
+.ElasticSearch REST API
+|===
+|Task|URL
+
+|Query details of a specific ES node
+|http://172.28.128.10:9200
+
+|Query cluster status
+(Can query all consul instances)
+|http://172.28.128.10:9200/_cluster/health
+http://172.28.128.11:9200/_cluster/health
+http://172.28.128.12:9200/_cluster/health
+|===
++
+- Two ElasticSearch Management Plugins are also available that make viewing cluster information
+much simpler via their Web UIs
++
+.Accessing ElasticSearch Plugins
+|===
+|Plugin|URL
+
+|ElasticSearch HQ
+|http://172.28.128.10:9200/_plugin/hq
+
+|ElasticSearch HEAD (much older)
+|http://172.28.128.10:9200/_plugin/head
+|===
++
 - SSH into the Docker hosts to inspect Docker container status
 +
 `vagrant ssh docker-1`
@@ -76,31 +137,6 @@ Once inside the Docker host, you can query Docker via
 `docker ps` (view all running containers)
 +
 `docker ps -a` (view all containers)
-- Access the Consul Web UI to view all available services
-+
-http://172.28.128.30:8500/ui/
-- View all services and instances registered with Consul by using
-the Consul REST API(s) on any of the `ext-n` machines
-+
-*Examples:*
-+
-View all registered services
-+
-http://172.28.128.10:8500/v1/catalog/services
-+
-http://172.28.128.11:8500/v1/catalog/services
-+
-View details of a specific service
-+
-http://172.28.128.11:8500/v1/catalog/service/demosvc.1
-
-- Access the Fabio HTTP Router Web UI to view all service instances
-+
-http://172.28.128.31:9998
-+
-The services can be accessed via the routers IP on port 9999
-+
-http://172.28.128.31:9999
 
 == Minimal startup
 

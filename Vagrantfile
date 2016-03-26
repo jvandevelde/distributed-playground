@@ -28,6 +28,11 @@ Vagrant.configure(2) do |config|
                 s.path = "provision-scripts/consul_server_only.sh"
                 s.args   = ["/vagrant/consul/server-" + server["name"] + ".json"]
             end
+            
+            srv.vm.provision "shell" do |s|
+                s.path = "provision-scripts/elasticsearch_master.sh"
+                s.args   = [server["name"]]
+            end
         end
     end
     
