@@ -141,5 +141,29 @@ NOTE: Registrator communicates with Consul via this container instead of the mai
   which are then forwarded to the server nodes.
 
 == Debugging
+=== Windows 10
 
-WARNING: TODO
+WARNING: I've run into problems individually updating and running the latest Docker Toolbox, Vagrant and Virtual Box
+on the latest Windows 10 Update (Version 1511 - released March 8th, 2016).
+Doing so may result in problems with Vagrant or the Docker Toolbox Quickstart Terminal not starting up properly due
+to "Network interface issues"
+This appears to have something to do with the discussion found here:
+http://stackoverflow.com/questions/33725779/failed-to-open-create-the-internal-network-vagrant-on-windows10
+
+I was not able to get all 3 tools to work together until I did the following:
+
+1. Uninstall Docker Toolbox
+2. Uninstall Virtual Box
+3. Download and install an older version (10.2.2) of Docker Toolbox
++
+https://github.com/docker/toolbox/releases/download/v1.10.2/DockerToolbox-1.10.2.exe
++
+This version of Docker Toolbox will install the following software/versions
++
+.ToolBox 1.10.2 Software
+|===
+|Package|Version
+|Docker
+|v1.10.2
+|VirtualBox
+|v5.0.14
