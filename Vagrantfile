@@ -9,8 +9,8 @@ servers = YAML.load_file('servers.yaml')
 Vagrant.configure(2) do |config|
 
     #
-    # Begin creating defined VMs to host docker external cluster(s).
-    # Right now just Consul.io, but possibly ElasticSearch masters
+    # Begin creating defined VMs to host docker external clusters.
+    # Right now just Consul and Elasticsearch clusters hosted here
     #
     servers['cluster-servers'].each do |server|
 
@@ -66,11 +66,21 @@ Vagrant.configure(2) do |config|
             srv.vm.provision "shell", inline:
                 "ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill"
 
+            # Setup automatic docker container based service registry via Consul.
+            # On startup, containers will automatically be registered in the service registry
             srv.vm.provision "shell" do |s|
                 s.path = "provision-scripts/docker_registry_setup.sh"
                 s.args = [server["private_ip"]]
             end
+            
+            # install tools like logstash that can be used by other containers
+            # === Current ===
+            #   1. Logstash -> Used to forward logs from containers/host to elasticsearch
+            srv.vm.provision "shell" do |s|
+                s.path = "provision-scripts/docker_infrastructure.sh"
+            end
 
+            # Install multiple instances of a demo service to demostrate the various tools/concepts
             srv.vm.provision "shell" do |s|
                 s.path = "provision-scripts/docker_demo_svcs.sh"
                 s.args = [server["container_prefix"]]
@@ -124,10 +134,25 @@ Vagrant.configure(2) do |config|
         router.vm.provision "shell", path: "provision-scripts/fabio.sh"
     end
     
+    # Vagrant machine that is actually just launching a Docker container inside a
+    # previously defined machine. Allows you to control containers as if they were 
+    # regular Vagrant machines (status, up, destroy, halt, etc.)
+    config.vm.define "docker-kibana" do |m|
+        m.vm.provider :docker do |d|
+            d.vagrant_machine = "docker-1"
+            d.vagrant_vagrantfile = "./Vagrantfile"
+            d.name = 'kibana-dashboard'
+            d.image = "kibana:4.4"     #latest requires newest ES 2.3 juest released March 30, 2016
+            d.remains_running = true
+            d.create_args = ["-e", "ELASTICSEARCH_URL=http://172.28.128.10:9200"]
+            d.ports = ["5601:5601"]
+        end
+    end
     
-    # Just a sample of a deploying a vagrant machine that uses the docker provider
+    # A sample of a deploying a Vagrant machine that uses the Docker provider
+    # but first builds a local Docker image from source prior to deploying the container.
     # This is good for things like dev environments backed by Docker
-    #   or developing Dockerfiles
+    # or developing Dockerfiles
     #  - Requires a docker host vagrant machine to be available/defined
     #  - Will build a Dockerfile at the location of build_dir
     #  - Will create a Vagrant machine that can be controlled via vagrant up/destroy/etc
@@ -142,5 +167,5 @@ Vagrant.configure(2) do |config|
             d.vagrant_vagrantfile = "./Vagrantfile"
         end
     end
-
+    
 end
