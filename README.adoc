@@ -177,6 +177,33 @@ NOTE: Registrator communicates with Consul via this container instead of the mai
   which are then forwarded to the server nodes.
 
 == Debugging
+
+=== Vagrant & VirtualBox Guest Additions Versioning
+
+The `ubuntu\trusty64` Vagrant boxes do not always have the most current VirtualBox Guest additions installed
+on them which causes a warning message to be displayed when originally creating a Vagrant machine (ie: during 'vagrant up').
+This message indicates that this condition could also cause the setup of Vagrant's synced folders to fail.
+
+This has occasionally happened to me after upgrades of Docker or Vagrant. While the machines still work, Vagrant breaks out of
+provisioning any remaining machines when it can't setup synced folders.
+
+You can address this in a couple of ways:
+
+1. Manually install the correct version of the Guest Additions and update your
+local box definition with `vagrant package` See https://gist.github.com/fernandoaleman/5083680[this gist] for more details
++
+*Note* This isn't a great solution because you would need to perform this for every box update you want might want to use
+2. Install the 'vagrant-vbguest' plugin that ensures the latest Virtual Box Guest Addtions package gets installed
+on each Vagrant machine as it's being created. You can do this by running the following command:
++
+`vagrant plugin install vagrant-vbguest`
++
+You can update this plugin with:
++
+`vagrant plugin update vagrant-vbguest`
++
+For more information, visit the project repository on https://github.com/dotless-de/vagrant-vbguest/[Github]
+
 === Windows 10
 
 WARNING: I've run into problems individually updating and running the latest Docker Toolbox, Vagrant and Virtual Box
