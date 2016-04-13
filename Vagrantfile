@@ -25,6 +25,10 @@ Vagrant.configure(2) do |config|
             srv.vm.network "private_network", ip: server["private_ip"]
             
             srv.vm.provision "shell" do |s|
+                s.path = "provision-scripts/redis.sh"
+            end
+            
+            srv.vm.provision "shell" do |s|
                 s.path = "provision-scripts/consul_server_only.sh"
                 s.args   = ["/vagrant/consul/server-" + server["name"] + ".json"]
             end
