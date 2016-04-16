@@ -1,0 +1,70 @@
+= Logging
+:imagesdir: docs/images
+ifdef::env-github[]
+:note-caption: :information_source:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+:important-caption: :exclamation:
+endif::[]
+
+== Overview
+In the system, logging is provided by the ELK stack (Elasticsearch, Logstash, Kibana).
+This setup provides a way for centralized logging for everything in the environment.
+This includes not only applications, but infrastructure as Docker has logging drivers
+that can output logs in a format Logstash can pick up and parse.
+
+The ELK stack consists of:
+
+1. Elasticsearch - A distributed document store. Once event has been processed
+and normalized by Logstash, they can be stored in Elasticsearch (and/or sent to other
+systems for further processing).
+2. Logstash - Allows centralized processing of all types of event data including logs.
+Logs can be collected from remote systems in a wide variety of ways such as log shipping,
+UDP/TCP, Redis, direct file access and more. Logstash can normalize varying log schemas
+that exist across your applications, making it easier to reason about the system as a whole.
+3. Kibana - A flexible, web based analytics and visualization platform that allows you
+to perform ad-hoc queries against your log data as well as build dashboards from those queries.
+
+=== Platform Details
+1. Elasticsearch
++
+A 3-node cluster is installed on the ext-n servers. This was done to make sure that storage
+is available to the Docker engine as well as just containers hosted inside a healthy Docker host.
+2. Logstash
++
+Logstash is hosted inside a Docker container on each Docker host machine and is automatically
+provisioned as part of each hosts setup process (managed internally in the Vagrantfile). This
+allows all applications (containers or otherwise) to have local access to a Logstash instance
+which can then forward the normalized output to Elasticsearch for storage (actually to a Redis
+broker first, see the *Redis* section below)
+3. Kibana
++
+The Kibana visualization application is hosted inside a Docker container on the
+`docker-1` host. This container is managed by Vagrant as a machine named `kibana-docker`.
+To start Kibana you would run:
++
+vagrant up `kibana-docker`
++
+And then you can access the dashboard at http://172.28.128.20:5601/
+
+
+== Redis
+Redis is being used as a broker between producers (application containers, Docker) and
+Logstash. This provides a buffer to store logs if the logstash consumers are unavailable
+or the system starts generating too many messages for the configured Logstash inputs. Inputs
+often have buffers that could overflow in these scenarios, which could result in lost logs.
+Having a temporary in-memory (but also persisted to disk) list containing log messages prevents 
+this scenario.
+
+=== Connecting to Redis
+In this setup, Redis is installed directly on 
+- ext-1 [172.28.128.10:6379]
+- ext-2 [172.28.128.11:6379]
+- ext-3 [172.28.128.12:6379]
+
+- You can `vagrant ssh` into any of these machines any connect via `redis-cli`
+- Or you can use http://redisdesktop.com/[Redis Desktop Manager] to connect to
+the redis instance on port 6379
+
+
+== .NET Core Logging

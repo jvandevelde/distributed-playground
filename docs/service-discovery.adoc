@@ -1,0 +1,10 @@
+= Service Discovery
+:imagesdir: docs/images
+ifdef::env-github[]
+:note-caption: :information_source:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+:important-caption: :exclamation:
+endif::[]
+
+TIP: Currently, service discovery is covered in the repositories README

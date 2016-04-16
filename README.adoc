@@ -1,5 +1,5 @@
 = Getting Started
-:imagesdir: images
+:imagesdir: docs/images
 ifdef::env-github[]
 :note-caption: :information_source:
 :tip-caption: :bulb:
@@ -7,9 +7,10 @@ ifdef::env-github[]
 :important-caption: :exclamation:
 endif::[]
 
-Written using asciidoctor vs. markdown as a learning exercise
+== Contents
+link:README.adoc[Overview (This page)]
 
-WARNING: Work in progress
+link:docs/logging.adoc[Logging System Details]
 
 == Overview
 This repository contains utilizes the following stack to create a distributed
