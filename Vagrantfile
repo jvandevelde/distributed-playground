@@ -82,6 +82,7 @@ Vagrant.configure(2) do |config|
             #   1. Logstash -> Used to forward logs from containers/host to elasticsearch
             srv.vm.provision "shell" do |s|
                 s.path = "provision-scripts/docker_infrastructure.sh"
+                s.args = [server["name"]]   #used to configure logstash
             end
 
             # Install multiple instances of a demo service to demostrate the various tools/concepts
